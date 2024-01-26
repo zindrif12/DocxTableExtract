@@ -1,0 +1,112 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        border: 3px solid black; /* Set border color and increase pixel size */
+    }
+
+    th, td {
+        border: 3px solid black; /* Set border color and increase pixel size */
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #000000;
+    }
+</style>
+
+<h2>Scan DOCX file</h2>
+
+@using (Html.BeginForm("CountImages", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div>
+        <input type="file" name="file" id="file" accept=".docx" required />
+    </div>
+    <div>
+        <input type="submit" value="SCAN FILE" />
+    </div>
+}
+
+@if (ViewBag.Error != null)
+{
+    <div style="color: red;">
+        @ViewBag.Error
+    </div>
+}
+
+@if (ViewBag.ImageCount != null)
+{
+    <div>
+        <p>Number of Images in the DOCX file: @ViewBag.ImageCount</p>
+    </div>
+
+    <div>
+        @if ((int)ViewBag.ImageCount > 0)
+        {
+            <p>Image(s):</p>
+            for (int i = 0; i < (int)ViewBag.ImageCount; i++)
+            {
+                var imageBase64 = ViewBag.ImageData[i];
+                <div>
+                    <img src="data:image/png;base64, @imageBase64" alt="Image @(i + 1)" />
+                    <hr />
+                </div>
+            }
+
+            if (ViewBag.ImagesFolderPath != null)
+            {
+                <div>
+                    <p>Images saved to: @ViewBag.ImagesFolderPath</p>
+                    <a href="@Url.Content(ViewBag.ImagesFolderPath)" download>Download Images</a>
+                </div>
+            }
+        }
+    </div>
+
+    if (ViewBag.TableCount != null)
+    {
+        <div>
+            <p>Number of Tables in the DOCX file: @ViewBag.TableCount</p>
+        </div>
+
+        <div>
+            @if ((int)ViewBag.TableCount > 0)
+            {
+                <p>Table(s):</p>
+                for (int i = 0; i < (int)ViewBag.TableCount; i++)
+                {
+                    var tableDataList = ViewBag.TableDataList;
+                    if (tableDataList != null && tableDataList.Count > i)
+                    {
+                        var tableData = tableDataList[i].Item2; // Access the second item in the tuple
+                        <div>
+                            @Html.Raw(tableData)
+                            <p>Table Number: @(i + 1)</p>
+                        </div>
+                    }
+                }
+
+                if (ViewBag.TablesFolderPath != null)
+                {
+                    <div>
+                        <p>Tables saved to: @ViewBag.TablesFolderPath</p>
+                        <a href="@Url.Content(ViewBag.TablesFolderPath)" download>Download Tables Folder</a>
+                    </div>
+                }
+            }
+        </div>
+    }
+
+    if (ViewBag.TextFilePath != null)
+    {
+        <div>
+            <p>Text saved to: @ViewBag.TextFilePath</p>
+            <a href="@Url.Content(ViewBag.TextFilePath)" download>Download Text</a>
+        </div>
+    }
+}
